@@ -36,6 +36,7 @@ profile
 **/VisualStudio[0-9]*/Win32
 **/VisualStudio[0-9]*/x64
 **/Builds/x64
+**/Builds/VisualStudio2022
 **/.vs
 **/CodeBlocks/bin
 **/CodeBlocks/obj
