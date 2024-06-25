@@ -322,7 +322,11 @@ public:
 			    }
                 averageMagnitudeOut[i] /= averageNumber;
 		    }
-            averageFifo.clear();
+            for (int i = 0; i < scopeSize; ++i)
+            {
+                averageFifo.removeAndReturn(i); 
+            }
+            //averageFifo.clear();
         } 
     }
 
