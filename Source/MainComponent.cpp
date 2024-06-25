@@ -37,17 +37,22 @@ MainComponent::MainComponent()
     syncButton.setButtonText("Sync");
     syncButton.addListener(this);
 
+    addAndMakeVisible(STModeButton);
+    STModeButton.setButtonText("Self-test mode");
+    STModeButton.addListener(this);
+
     // Add sliders
-    //addAndMakeVisible(masterFaderSlider);
+    addAndMakeVisible(masterFaderSlider);
     masterFaderSlider.setSliderStyle(juce::Slider::LinearVertical);
     masterFaderSlider.setRange(0.0, 1.0);
     masterFaderSlider.setTextValueSuffix("");
+    masterFaderSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
     masterFaderSlider.addListener(this);
 
-    //addAndMakeVisible(levelLabel);
-    levelLabel.setText("Main Level", juce::dontSendNotification);
+    addAndMakeVisible(levelLabel);
+    levelLabel.setText("Main LR Level", juce::dontSendNotification);
     levelLabel.setJustificationType(juce::Justification::centred);
-    levelLabel.attachToComponent(&masterFaderSlider, true);
+    levelLabel.attachToComponent(&masterFaderSlider, false);
 
     //addAndMakeVisible(GEQSlider);
     GEQSlider.setSliderStyle(juce::Slider::LinearVertical);
@@ -59,6 +64,18 @@ MainComponent::MainComponent()
     GEQLabel.setText("Main Level", juce::dontSendNotification);
     GEQLabel.setJustificationType(juce::Justification::centred);
     GEQLabel.attachToComponent(&GEQSlider, false);
+
+    // Add labels
+    addAndMakeVisible(IPAddressLabel);
+    IPAddressLabel.setText(OSCEngine->IPAddress,juce::dontSendNotification);
+    IPAddressLabel.setJustificationType(juce::Justification::centred);
+    IPAddressLabel.setEditable(true);
+    IPAddressLabel.addListener(this);
+
+    addAndMakeVisible(IPLabel);
+    IPLabel.setText("IP Address: ", juce::dontSendNotification);
+    IPLabel.setJustificationType(juce::Justification::right);
+    IPLabel.attachToComponent(&IPAddressLabel, true);
 }
 
 MainComponent::~MainComponent()
@@ -136,11 +153,15 @@ void MainComponent::resized()
     // Add buttons
     initButton.setBounds(topLeft, topLeft, getWidth() / 5, getHeight() / 25);
     syncButton.setBounds(topLeft, topLeft + getHeight() / 20, getWidth() / 5, getHeight() / 25);
+    STModeButton.setBounds(12.1 * getWidth() / 16, 7 * getHeight() / 8, getWidth() / 12, getHeight() / 25);
 
     // Add sliders
     auto sliderLeft = 120;
-    masterFaderSlider.setBounds(sliderLeft, sliderLeft, getWidth() / 30, getHeight() / 2);
+    masterFaderSlider.setBounds(12 * getWidth() / 16, 3 * getHeight() / 8, getWidth() / 15, getHeight() / 2.5);
     GEQSlider.setBounds(sliderLeft + getWidth() / 25, sliderLeft, getWidth() / 30, getHeight() / 2);
+
+    // Add labels
+    IPAddressLabel.setBounds(13 * getWidth() / 16, 7 * getHeight() / 8 + getHeight() / 25, getWidth() / 12, getHeight() / 25);
 
 }
 
@@ -156,6 +177,18 @@ void MainComponent::buttonClicked(juce::Button* button)
 		DBG("Sync button clicked!");
         OSCEngine->OSCSender.fader("main", "st");
 	}
+
+    if (button == &STModeButton)
+    {
+        if (STModeButton.getToggleState())
+        {
+            DBG("Self-test mode enabled!");
+        }
+        else
+        {
+            DBG("Self-test mode disabled!");
+        }
+    }
 }
 
 void MainComponent::sliderValueChanged (juce::Slider* slider)
@@ -172,5 +205,14 @@ void MainComponent::sliderValueChanged (juce::Slider* slider)
         {
         OSCEngine->OSCSender.fx(8, i, (float)GEQSlider.getValue());
         }
+	}
+}
+
+void MainComponent::labelTextChanged(juce::Label* label)
+{
+    if (label == &IPAddressLabel) {
+		DBG("Changing IP Address to: " + IPAddressLabel.getText() + "...");
+		OSCEngine->IPAddress = IPAddressLabel.getText();
+        OSCEngine->changeIPAddress();
 	}
 }

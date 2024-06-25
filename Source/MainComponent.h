@@ -11,11 +11,12 @@
     This component lives inside our window, and this is where you should put all
     your controls and content.
 */
-class MainComponent  :
+class MainComponent :
     public juce::AudioAppComponent,
     public juce::OSCSender,
-    public juce::Slider::Listener, 
-    public juce::Button::Listener
+    public juce::Slider::Listener,
+    public juce::Button::Listener,
+    public juce::Label::Listener
     //SpecAnalyzer
     //public juce::Timer
 {
@@ -36,6 +37,7 @@ public:
     //==============================================================================
     void buttonClicked(juce::Button* button) override;
     void sliderValueChanged(juce::Slider* slider) override;
+    void labelTextChanged(juce::Label* label) override;
 
 private:
     //==============================================================================
@@ -58,10 +60,13 @@ private:
     // Adding sliders
     juce::TextButton syncButton;
     juce::TextButton initButton;
+    juce::ToggleButton STModeButton;
     juce::Slider masterFaderSlider;
     juce::Label  levelLabel;
     juce::Slider GEQSlider;
     juce::Label GEQLabel;
+    juce::Label IPAddressLabel;
+    juce::Label IPLabel;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainComponent)
 };

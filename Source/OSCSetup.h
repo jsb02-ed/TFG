@@ -179,6 +179,15 @@ public:
         }
     }
 
+    void changeIPAddress() {
+        if (OSCSender.connectToSocket(socket, IPAddress, 10023)) {
+            DBG("IP Address changed to: " + IPAddress);
+        }
+        else {
+            DBG("IP Address NOT changed");
+        }
+	}
+
     /*static OSCSetup* getInstance()
 	    {
 		    if (OSCinstance == nullptr)
@@ -191,5 +200,6 @@ public:
     juce::DatagramSocket socket;
     ModOSCSender OSCSender;
     ModOSCReceiver OSCReceiver;
+    juce::String IPAddress = "169.254.121.37";
 };
 
