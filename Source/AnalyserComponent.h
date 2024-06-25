@@ -299,34 +299,40 @@ public:
 
         juce::FloatVectorOperations::copy(phase, phaseDifference.data(), scopeSize);
 
-        // Average magnitude
-        averageMagnitude();
+        // Average magnitude and phase
+        averageMagnPhase();
 
         //maxMagnitude(); //Old function no longer used
 
     }
 
-    void averageMagnitude()
+    void averageMagnPhase()
     {
         for (int i = 0; i < scopeSize; i++)
         {
-            averageFifo.add(magnitude[i]);
+            averageMagnitudeFifo.add(magnitude[i]);
+            averagePhaseFifo.add(phase[i]);
         }
-        if (averageFifo.size() > averageFifoSize) {
+        if (averageMagnitudeFifo.size() > averageFifoSize) {
             for (int i = 0; i < scopeSize; ++i)
 		    {
 			    averageMagnitudeOut[i] = 0;
+                averagePhaseOut[i] = 0;
 			    for (int j = 0; j < averageNumber; ++j)
 			    {
-                    averageMagnitudeOut[i] = averageMagnitudeOut[i] + averageFifo[j * scopeSize + i];
+                    averageMagnitudeOut[i] = averageMagnitudeOut[i] + averageMagnitudeFifo[j * scopeSize + i];
+                    averagePhaseOut[i] = averagePhaseOut[i] + averagePhaseFifo[j * scopeSize + i];
 			    }
                 averageMagnitudeOut[i] /= averageNumber;
+                averagePhaseOut[i] /= averageNumber;
 		    }
             for (int i = 0; i < scopeSize; ++i)
             {
-                averageFifo.removeAndReturn(i); 
+                averageMagnitudeFifo.removeAndReturn(i); 
+                averagePhaseFifo.removeAndReturn(i);
             }
-            //averageFifo.clear();
+            //averageMagnitudeFifo.clear();
+            //averagePhaseFifo.clear();
         } 
     }
 
@@ -385,30 +391,29 @@ public:
                 float y1 = juce::jmap(averageMagnitudeOut[i - 1], 0.0f, 1.0f, (float)height, 0.0f);
                 float x2 = juce::jmap((float)i, 0.0f, (float)(scopeSize - 1), 0.0f, (float)width);
                 float y2 = juce::jmap(averageMagnitudeOut[i], 0.0f, 1.0f, (float)height, 0.0f);
-                g.drawLine(x1,y1,x2,y2,3);
+                g.drawLine(x1, y1, x2, y2, 3);
 
                 // Draw the threshold line
                 if (showThreshold)
                 {
-					g.setColour(juce::Colours::grey);
-					float thresholdY = juce::jmap(clusterThreshold, 0.5f, 1.0f, (float)height / 2, 0.0f);
+                    g.setColour(juce::Colours::grey);
+                    float thresholdY = juce::jmap(clusterThreshold, 0.5f, 1.0f, (float)height / 2, 0.0f);
                     g.drawHorizontalLine(thresholdY, 0.0f, (float)width);
                     //Following 2 lines create a dashed line. Unabled because it slows down the GUI
-					//const float dashLengths[2] = { 4, 5 };
-					//g.drawDashedLine(juce::Line<float>(0.0f, thresholdY, (float)width, thresholdY), dashLengths, 2);
-				}
-
-                // Draw phase -------------------------!!!!
-                float v_offset = getHeight() / 2;
-                g.setColour(juce::Colours::yellow);
-                for (int i = 1; i < scopeSize; ++i)
-                {
-                    float x1 = juce::jmap((float)(i - 1), 0.0f, (float)(scopeSize - 1), 0.0f, (float)width);
-                    float y1 = juce::jmap(phase[i - 1], -juce::MathConstants<float>::pi, juce::MathConstants<float>::pi, (float)height, 0.0f) + v_offset;
-                    float x2 = juce::jmap((float)i, 0.0f, (float)(scopeSize - 1), 0.0f, (float)width);
-                    float y2 = juce::jmap(phase[i], -juce::MathConstants<float>::pi, juce::MathConstants<float>::pi, (float)height, 0.0f) + v_offset;
-                    g.drawLine(x1, y1, x2, y2, 1);
+                    //const float dashLengths[2] = { 4, 5 };
+                    //g.drawDashedLine(juce::Line<float>(0.0f, thresholdY, (float)width, thresholdY), dashLengths, 2);
                 }
+            }
+            // Draw phase -------------------------!!!!
+            float v_offset = getHeight() / 2;
+            g.setColour(juce::Colours::yellow);
+            for (int i = 1; i < scopeSize; ++i)
+            {
+                float x1 = juce::jmap((float)(i - 1), 0.0f, (float)(scopeSize - 1), 0.0f, (float)width);
+                float y1 = juce::jmap(averagePhaseOut[i - 1], -juce::MathConstants<float>::pi, juce::MathConstants<float>::pi, (float)height, 0.0f) + v_offset;
+                float x2 = juce::jmap((float)i, 0.0f, (float)(scopeSize - 1), 0.0f, (float)width);
+                float y2 = juce::jmap(averagePhaseOut[i], -juce::MathConstants<float>::pi, juce::MathConstants<float>::pi, (float)height, 0.0f) + v_offset;
+                g.drawLine(x1, y1, x2, y2, 2);
             }
         }
         g.setColour(juce::Colours::white);
@@ -701,8 +706,10 @@ private:
     float magnitude[scopeSize];
     float phase[scopeSize]; // -----------------!
     int fifoAverageIndex = 0;
-    juce::Array<float> averageFifo;
+    juce::Array<float> averageMagnitudeFifo;
+    juce::Array<float> averagePhaseFifo;
     float averageMagnitudeOut[scopeSize];
+    float averagePhaseOut[scopeSize];
     juce::Array<float> avgMagnitude;
     juce::Array<float> avgMagnitudeSorted;
     int maxIdx = -1;
