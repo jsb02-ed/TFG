@@ -386,6 +386,7 @@ public:
             drawFrequencyScale(g, width, height);
             drawAmplitudeScale(g, width, height);
             drawFrequencyScale(g, width, height * 2);
+            drawPhaseScale(g, width, height);
 
             for (int i = 1; i < scopeSize; ++i)
             {
@@ -413,14 +414,20 @@ public:
             }
             // Draw phase -------------------------!!!!
             float v_offset = getHeight() / 2;
-            g.setColour(juce::Colours::yellow);
+            g.setColour(juce::Colours::red);
             for (int i = 1; i < scopeSize; ++i)
             {
                 float x1 = juce::jmap((float)(i - 1), 0.0f, (float)(scopeSize - 1), 0.0f, (float)width);
                 float y1 = juce::jmap(averagePhaseOut[i - 1], -juce::MathConstants<float>::pi, juce::MathConstants<float>::pi, (float)height, 0.0f) + v_offset;
                 float x2 = juce::jmap((float)i, 0.0f, (float)(scopeSize - 1), 0.0f, (float)width);
                 float y2 = juce::jmap(averagePhaseOut[i], -juce::MathConstants<float>::pi, juce::MathConstants<float>::pi, (float)height, 0.0f) + v_offset;
-                g.drawLine(x1, y1, x2, y2, 2);
+
+                // Check for phase wrap
+                const float phaseWrapThreshold = juce::MathConstants<float>::pi * 0.7f; // Add some tolerance
+                if (std::abs(averagePhaseOut[i] - averagePhaseOut[i - 1]) < phaseWrapThreshold)
+                {
+                    g.drawLine(x1, y1, x2, y2, 2);
+                }
             }
         }
         g.setColour(juce::Colours::white);
@@ -490,6 +497,36 @@ public:
             // Draw the frequency label
             juce::String ampLabel = juce::String(amp) + " dB"; 
             if (i == numDivisions/2) g.drawText(ampLabel, 5, y - 15, 60, 10, juce::Justification::centredLeft);
+            else g.drawText(ampLabel, 5, y - 5, 60, 10, juce::Justification::centredLeft);
+        }
+    }
+
+    void drawPhaseScale(juce::Graphics& g, int width, int height)
+    {
+        // Define min and max angles
+        const float minPh = 225;
+        const float maxPh = -225;
+
+        // Number of divisions on the y-axis
+        const int numDivisions = 10;
+
+        // Draw phase labels
+        for (int i = 1; i <= numDivisions - 1; ++i)
+        {
+            float proportionX = (float)i / (float)numDivisions;
+            float ph = minPh + proportionX * (maxPh - minPh);
+
+            // Calculate x position for this frequency
+            int y = proportionX * height + height;
+
+            // Draw an horizontal line
+            g.setColour(juce::Colours::lightgrey);
+            g.drawLine(0, y, width, y, 0.5);
+            g.setColour(juce::Colours::white);
+
+            // Draw the frequency label
+            juce::String ampLabel = juce::String(ph) + " deg";
+            if (i == numDivisions / 2) g.drawText(ampLabel, 5, y - 15, 60, 10, juce::Justification::centredLeft);
             else g.drawText(ampLabel, 5, y - 5, 60, 10, juce::Justification::centredLeft);
         }
     }
