@@ -98,7 +98,7 @@ public:
         maxClustersSlider.setBounds(getWidth() - 670, 10, 300, 30);
         maxClustersLabel.setBounds(getWidth() - 655, 17, 100, 30);
 		thresholdSlider.setBounds(0, 0, 30, getHeight() / 4);
-        showThresholdButton.setBounds(30, 10, 100, 30);
+        showThresholdButton.setBounds(60, 0, 100, 30);
     }
 
     // Manage button clicks
@@ -380,6 +380,13 @@ public:
 
         // Dual channel mode
         else if (mode == 1) {
+
+            // Draw grid
+            g.setColour(juce::Colours::white);
+            drawFrequencyScale(g, width, height);
+            drawAmplitudeScale(g, width, height);
+            drawFrequencyScale(g, width, height * 2);
+
             for (int i = 1; i < scopeSize; ++i)
             {
                 // Set the color deppending on the cluster
@@ -396,7 +403,7 @@ public:
                 // Draw the threshold line
                 if (showThreshold)
                 {
-                    g.setColour(juce::Colours::grey);
+                    g.setColour(juce::Colours::purple);
                     float thresholdY = juce::jmap(clusterThreshold, 0.5f, 1.0f, (float)height / 2, 0.0f);
                     g.drawHorizontalLine(thresholdY, 0.0f, (float)width);
                     //Following 2 lines create a dashed line. Unabled because it slows down the GUI
@@ -417,8 +424,6 @@ public:
             }
         }
         g.setColour(juce::Colours::white);
-        drawFrequencyScale(g, width, height);
-        drawFrequencyScale(g, width, height * 2);
     }
 
     void drawFrequencyScale(juce::Graphics& g, int width, int height)
@@ -456,6 +461,36 @@ public:
             if (i==0) g.drawText(freqLabel, x, height - 10, 60, 10, juce::Justification::left);
 			else if (i == numDivisions) g.drawText(freqLabel, x - 60, height - 10, 60, 10, juce::Justification::right);
 			else g.drawText(freqLabel, x - 30, height - 10, 60, 10, juce::Justification::centred);
+        }
+    }
+
+    void drawAmplitudeScale(juce::Graphics& g, int width, int height)
+    {
+        // Define min and max amplitudes
+        const float minAmp = 18;
+        const float maxAmp = -18;
+
+        // Number of divisions on the y-axis
+        const int numDivisions = 12;
+
+        // Draw amplitude labels
+        for (int i = 1; i <= numDivisions - 1; ++i)
+        {
+            float proportionX = (float)i / (float)numDivisions;
+            float amp = minAmp + proportionX * (maxAmp - minAmp);
+
+            // Calculate x position for this frequency
+            int y = proportionX * height;
+
+            // Draw an horizontal line
+            g.setColour(juce::Colours::lightgrey);
+            g.drawLine(0, y, width, y, 0.5);
+            g.setColour(juce::Colours::white);
+
+            // Draw the frequency label
+            juce::String ampLabel = juce::String(amp) + " dB"; 
+            if (i == numDivisions/2) g.drawText(ampLabel, 5, y - 15, 60, 10, juce::Justification::centredLeft);
+            else g.drawText(ampLabel, 5, y - 5, 60, 10, juce::Justification::centredLeft);
         }
     }
 
@@ -638,7 +673,7 @@ public:
                 }
             }
         }
-        return juce::Colours::white;
+        return juce::Colours::royalblue;
     }
 
 
