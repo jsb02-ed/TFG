@@ -418,6 +418,7 @@ public:
         }
         g.setColour(juce::Colours::white);
         drawFrequencyScale(g, width, height);
+        drawFrequencyScale(g, width, height * 2);
     }
 
     void drawFrequencyScale(juce::Graphics& g, int width, int height)
@@ -431,7 +432,7 @@ public:
         float logMaxFreq = std::log10(maxFreq);
 
         // Number of divisions on the x-axis
-        const int numDivisions = 8;
+        const int numDivisions = 10;
 
         // Draw the x-axis line
         g.setColour(juce::Colours::white);
@@ -452,7 +453,9 @@ public:
 
             // Draw the frequency label
             juce::String freqLabel = (freq >= 1000.0f) ? juce::String(freq / 1000.0f, 1) + " kHz" : juce::String((int)freq) + " Hz";
-            g.drawText(freqLabel, x - 20, height - 10, 40, 10, juce::Justification::centred);
+            if (i==0) g.drawText(freqLabel, x, height - 10, 60, 10, juce::Justification::left);
+			else if (i == numDivisions) g.drawText(freqLabel, x - 60, height - 10, 60, 10, juce::Justification::right);
+			else g.drawText(freqLabel, x - 30, height - 10, 60, 10, juce::Justification::centred);
         }
     }
 
