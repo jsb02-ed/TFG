@@ -43,6 +43,18 @@ public:
         resetButton.setButtonText("Reset");
         resetButton.addListener(this);
 
+        addAndMakeVisible(detectPhButton);
+        detectPhButton.setButtonText("Detect");
+        detectPhButton.addListener(this);
+
+        addAndMakeVisible(applyPhButton);
+        applyPhButton.setButtonText("Apply");
+        applyPhButton.addListener(this);
+
+        addAndMakeVisible(resetPhButton);
+        resetPhButton.setButtonText("Reset");
+        resetPhButton.addListener(this);
+
         addAndMakeVisible(maxClustersSlider);
         maxClustersSlider.setRange(1, 5, 1); // Range from 1 to 5, with step size of 1
         maxClustersSlider.setSliderStyle(juce::Slider::LinearHorizontal);
@@ -85,6 +97,9 @@ public:
     void paint(juce::Graphics& g) override
     {
         g.fillAll(juce::Colours::black);
+        g.fillAll(juce::Colour::fromRGB(15, 15, 15));
+        g.setColour(juce::Colour::fromRGB(45, 45, 45));
+        g.drawLine(0, getHeight() / 2 + 5, getWidth(), getHeight() / 2 + 5, 6);
         g.setOpacity(1.0f);
         g.setColour(juce::Colours::white);
         drawFrame(g,mode);
@@ -95,6 +110,9 @@ public:
         detectButton.setBounds(getWidth() - 330, 10, 100, 30);
 		applyButton.setBounds(getWidth() - 220, 10, 100, 30);
         resetButton.setBounds(getWidth() - 110, 10, 100, 30);
+        detectPhButton.setBounds(getWidth() - 330, getHeight() / 2 + 10, 100, 30);
+        applyPhButton.setBounds(getWidth() - 220, getHeight() / 2 + 10, 100, 30);
+        resetPhButton.setBounds(getWidth() - 110, getHeight() / 2 + 10, 100, 30);
         maxClustersSlider.setBounds(getWidth() - 670, 10, 300, 30);
         maxClustersLabel.setBounds(getWidth() - 655, 17, 100, 30);
 		thresholdSlider.setBounds(0, 0, 30, getHeight() / 4);
@@ -844,6 +862,9 @@ private:
     juce::TextButton detectButton;
     juce::TextButton applyButton;
     juce::TextButton resetButton;
+    juce::TextButton detectPhButton;
+    juce::TextButton applyPhButton;
+    juce::TextButton resetPhButton;
     juce::Slider maxClustersSlider;
     juce::Label maxClustersLabel;
     juce::Slider thresholdSlider;
