@@ -100,6 +100,14 @@ MainComponent::MainComponent()
     IPLabel.setText("IP Address: ", juce::dontSendNotification);
     IPLabel.setJustificationType(juce::Justification::right);
     IPLabel.attachToComponent(&IPAddressLabel, true);
+
+    addAndMakeVisible(magnitudeLabel);
+    magnitudeLabel.setText("MAGNITUDE", juce::dontSendNotification);
+    magnitudeLabel.setJustificationType(juce::Justification::left);
+
+    addAndMakeVisible(phaseLabel);
+    phaseLabel.setText("PHASE", juce::dontSendNotification);
+    phaseLabel.setJustificationType(juce::Justification::left);
 }
 
 MainComponent::~MainComponent()
@@ -192,6 +200,8 @@ void MainComponent::resized()
 
     // Add labels
     IPAddressLabel.setBounds(13 * getWidth() / 16, 7 * getHeight() / 8 + getHeight() / 25, getWidth() / 12, getHeight() / 25);
+    magnitudeLabel.setBounds(getWidth() / 16, getHeight() / 8 - getHeight() / 20, getWidth() / 6, getHeight() / 20);
+    phaseLabel.setBounds(getWidth() / 16, 6.6 * getHeight() / 8 + getHeight() / 20, getWidth() / 6, getHeight() / 20);
 
 }
 

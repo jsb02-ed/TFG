@@ -75,6 +75,8 @@ private:
     bool delayMeasOn = false;
     juce::TextButton freezeButton;
     bool freezed = false;
+    juce::Label magnitudeLabel;
+    juce::Label phaseLabel;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainComponent)
 };
