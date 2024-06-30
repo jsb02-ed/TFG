@@ -26,12 +26,14 @@ public:
         this->send("/" + type + "/" + number + "/mix/fader", value);
     }
 
-    void delayOut(int out, bool on) {
-        this->send("/outputs/main/" + juce::String(out) + "/delay/on", on);
+    void delayOut(juce::String out, bool on) {
+        this->send("/outputs/main/" + out + "/delay/on", on);
     }
 
-    void delayOut(int out, float time) {
-        this->send("/outputs/main/" + juce::String(out) + "/delay/time", time);
+    void delayOut(juce::String out, float time) {
+        time = (time - 0.2) / 500;
+        this->send("/outputs/main/" + out + "/delay/time", time);
+        DBG(time);
     }
 
     void fx(int number, int parameter, float value) {

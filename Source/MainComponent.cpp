@@ -234,12 +234,12 @@ void MainComponent::buttonClicked(juce::Button* button)
     if (button == &delayMeasButton) {
         if (delayMeasOn) {
             delayMeasOn = false;
-            OSCEngine->OSCSender.delayOut(1, false);
+            OSCEngine->OSCSender.delayOut("01", false);
             delayMeasSlider.setVisible(false);
         }
         else {
             delayMeasOn = true;
-            OSCEngine->OSCSender.delayOut(1, true);
+            OSCEngine->OSCSender.delayOut("01", true);
             delayMeasSlider.setVisible(true);
         }
     }
@@ -247,12 +247,12 @@ void MainComponent::buttonClicked(juce::Button* button)
     if (button == &delayRefButton) {
         if (delayRefOn) {
             delayRefOn = false;
-            OSCEngine->OSCSender.delayOut(1, false);
+            OSCEngine->OSCSender.delayOut("02", false);
             delayRefSlider.setVisible(false);
         }
         else {
             delayRefOn = true;
-            OSCEngine->OSCSender.delayOut(1, true);
+            OSCEngine->OSCSender.delayOut("02", true);
             delayRefSlider.setVisible(true);
         }
     }
@@ -291,12 +291,12 @@ void MainComponent::sliderValueChanged (juce::Slider* slider)
 
     if (slider == &delayMeasSlider) {
         DBG("Measurement delay: " + juce::String(delayMeasSlider.getValue()));
-        OSCEngine->OSCSender.delayOut(1, (float)delayMeasSlider.getValue());
+        OSCEngine->OSCSender.delayOut("01", (float)delayMeasSlider.getValue());
     }
 
     if (slider == &delayRefSlider) {
         DBG("Reference delay: " + juce::String(delayRefSlider.getValue()));
-        OSCEngine->OSCSender.delayOut(2, (float)delayRefSlider.getValue());
+        OSCEngine->OSCSender.delayOut("02", (float)delayRefSlider.getValue());
     }
 }
 
