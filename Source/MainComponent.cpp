@@ -29,7 +29,7 @@ MainComponent::MainComponent()
     OSCEngine->OSCSender.sendStatus();
 
     // Add buttons
-    //addAndMakeVisible(initButton);
+    addAndMakeVisible(initButton);
     initButton.setButtonText("Init");
     initButton.addListener(this);
 
@@ -210,7 +210,7 @@ void MainComponent::buttonClicked(juce::Button* button)
 {
     if (button == &initButton) {
         DBG("Initializing...");
-        DBG("Init not implemented!");
+        OSCEngine->OSCSender.initX32();
         //OSCEngine->OSCSender.fader("main", "st");
     }
 

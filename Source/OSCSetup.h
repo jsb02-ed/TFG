@@ -102,21 +102,22 @@ public:
 
     void initX32() {
         sendCustom("/main/st/mix/on", "1");
-        sendCustom("/main/st/mix/fader", "0.0");
+        sendCustom("/main/st/mix/fader", "-90.0");
         resetStEq();
         sendCustom("/bus/12/mix/on", "1");
-        sendCustom("/config/osc/level", "0.7500");
+        sendCustom("/config/osc/level", "0.3750");
         sendCustom("/config/osc/type", "1");
         sendCustom("/config/osc/dest", "11");
         sendCustom("/-stat/osc/on", "1");
         sendCustom("/bus/12/mix/fader", "0.7478");
-        // Send MixBus 12 to USB2
+        sendCustom("/outputs/main/02/src", "15"); // Send MixBus 12 to OUT2
         sendCustom("/ch/02/source", "60");
         sendCustom("/ch/02/preamp/trim", "0.0");
         sendCustom("/ch/02/mix/on", "1");
         sendCustom("/ch/02/mix/fader", "0.0");
         resetChEq("02");
-        // Send Ch 02 to USB1
+        sendCustom("/outputs/main/01/src", "27"); // Send Ch 02 to OUT1
+        sendCustom("/config/routing/CARD/1-8", "20");
     }
 
 };
