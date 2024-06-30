@@ -41,6 +41,18 @@ MainComponent::MainComponent()
     STModeButton.setButtonText("Self-test mode");
     STModeButton.addListener(this);
 
+    addAndMakeVisible(freezeButton);
+    freezeButton.setButtonText("Freeze");
+    freezeButton.addListener(this);
+
+    addAndMakeVisible(delayRefButton);
+    delayRefButton.setButtonText("Reference signal DELAY");
+    delayRefButton.addListener(this);
+
+    addAndMakeVisible(delayMeasButton);
+    delayMeasButton.setButtonText("Measurement signal DELAY");
+    delayMeasButton.addListener(this);
+
     // Add sliders
     addAndMakeVisible(masterFaderSlider);
     masterFaderSlider.setSliderStyle(juce::Slider::LinearVertical);
@@ -64,6 +76,18 @@ MainComponent::MainComponent()
     GEQLabel.setText("Main Level", juce::dontSendNotification);
     GEQLabel.setJustificationType(juce::Justification::centred);
     GEQLabel.attachToComponent(&GEQSlider, false);
+
+    addChildComponent(delayRefSlider);
+    delayRefSlider.setSliderStyle(juce::Slider::LinearBar);
+    delayRefSlider.setRange(0.3, 100.0,0.1);
+    delayRefSlider.setTextValueSuffix(" ms");
+    delayRefSlider.addListener(this);
+
+    addChildComponent(delayMeasSlider);
+    delayMeasSlider.setSliderStyle(juce::Slider::LinearBar);
+    delayMeasSlider.setRange(0.3, 100.0, 0.1);
+    delayMeasSlider.setTextValueSuffix(" ms");
+    delayMeasSlider.addListener(this);
 
     // Add labels
     addAndMakeVisible(IPAddressLabel);
@@ -154,11 +178,17 @@ void MainComponent::resized()
     initButton.setBounds(topLeft, topLeft, getWidth() / 5, getHeight() / 25);
     syncButton.setBounds(topLeft, topLeft + getHeight() / 20, getWidth() / 5, getHeight() / 25);
     STModeButton.setBounds(12.1 * getWidth() / 16, 7 * getHeight() / 8, getWidth() / 12, getHeight() / 25);
+    freezeButton.setBounds(11 * getWidth() / 16 - getWidth() / 12, 7 * getHeight() / 8 + 10, getWidth() / 12, getHeight() / 25);
+    delayMeasButton.setBounds(9 * getWidth() / 16 - getWidth() / 8, 7 * getHeight() / 8 + 10, getWidth() / 8, getHeight() / 25);
+    delayRefButton.setBounds(9 * getWidth() / 16 - 2 * getWidth() / 8, 7 * getHeight() / 8 + 10, getWidth() / 8, getHeight() / 25);
 
     // Add sliders
     auto sliderLeft = 120;
     masterFaderSlider.setBounds(12 * getWidth() / 16, 3 * getHeight() / 8, getWidth() / 15, getHeight() / 2.5);
     GEQSlider.setBounds(sliderLeft + getWidth() / 25, sliderLeft, getWidth() / 30, getHeight() / 2);
+    delayMeasSlider.setBounds(9 * getWidth() / 16 - getWidth() / 8, 7.3 * getHeight() / 8 + 10, getWidth() / 8, getHeight() / 25);
+    delayRefSlider.setBounds(9 * getWidth() / 16 - 2 * getWidth() / 8, 7.3 * getHeight() / 8 + 10, getWidth() / 8, getHeight() / 25);
+    
 
     // Add labels
     IPAddressLabel.setBounds(13 * getWidth() / 16, 7 * getHeight() / 8 + getHeight() / 25, getWidth() / 12, getHeight() / 25);
@@ -189,6 +219,38 @@ void MainComponent::buttonClicked(juce::Button* button)
             DBG("Self-test mode disabled!");
         }
     }
+
+    if (button == &delayMeasButton) {
+        if (delayMeasOn) {
+            delayMeasOn = false;
+            OSCEngine->OSCSender.delayOut(1, false);
+            delayMeasSlider.setVisible(false);
+        }
+        else {
+            delayMeasOn = true;
+            OSCEngine->OSCSender.delayOut(1, true);
+            delayMeasSlider.setVisible(true);
+        }
+    }
+
+    if (button == &delayRefButton) {
+        if (delayRefOn) {
+            delayRefOn = false;
+            OSCEngine->OSCSender.delayOut(1, false);
+            delayRefSlider.setVisible(false);
+        }
+        else {
+            delayRefOn = true;
+            OSCEngine->OSCSender.delayOut(1, true);
+            delayRefSlider.setVisible(true);
+        }
+    }
+
+    if (button == &freezeButton) {
+        if (audioSetup.analyser.freezed) audioSetup.analyser.freezed = false;
+        else audioSetup.analyser.freezed = true;
+        DBG("Freeze state changed");
+    }
 }
 
 void MainComponent::sliderValueChanged (juce::Slider* slider)
@@ -206,6 +268,16 @@ void MainComponent::sliderValueChanged (juce::Slider* slider)
         OSCEngine->OSCSender.fx(8, i, (float)GEQSlider.getValue());
         }
 	}
+
+    if (slider == &delayMeasSlider) {
+        DBG("Measurement delay: " + juce::String(delayMeasSlider.getValue()));
+        OSCEngine->OSCSender.delayOut(1, (float)delayMeasSlider.getValue());
+    }
+
+    if (slider == &delayRefSlider) {
+        DBG("Reference delay: " + juce::String(delayRefSlider.getValue()));
+        OSCEngine->OSCSender.delayOut(2, (float)delayRefSlider.getValue());
+    }
 }
 
 void MainComponent::labelTextChanged(juce::Label* label)

@@ -57,7 +57,7 @@ private:
     // Set up Sliders
     //SlidersSetup* SlidersEngine = new SlidersSetup();
 
-    // Adding sliders
+    // Adding buttons & sliders
     juce::TextButton syncButton;
     juce::TextButton initButton;
     juce::ToggleButton STModeButton;
@@ -67,6 +67,14 @@ private:
     juce::Label GEQLabel;
     juce::Label IPAddressLabel;
     juce::Label IPLabel;
+    juce::ToggleButton delayRefButton;
+    juce::Slider delayRefSlider;
+    bool delayRefOn = false;
+    juce::ToggleButton delayMeasButton;
+    juce::Slider delayMeasSlider;
+    bool delayMeasOn = false;
+    juce::TextButton freezeButton;
+    bool freezed = false;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainComponent)
 };

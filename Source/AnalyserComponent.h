@@ -401,6 +401,8 @@ public:
                 float y2 = juce::jmap(averageMagnitudeOut[i], 0.0f, 1.0f, (float)height, 0.0f);
                 g.drawLine(x1, y1, x2, y2, 3);
 
+                // Draw freezed magnitude
+
                 // Draw the threshold line
                 if (showThreshold)
                 {
@@ -748,7 +750,6 @@ public:
         DBG("You must detect magnitude before applying filters!");
     }
 
-
     enum
     {
         fftOrder = 13,
@@ -757,6 +758,8 @@ public:
         averageNumber = 20,
         averageFifoSize = scopeSize * averageNumber
     };
+
+    bool freezed = false;
 
 private:
     juce::dsp::FFT forwardFFT;
