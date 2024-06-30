@@ -116,7 +116,8 @@ public:
         sendCustom("/ch/02/mix/on", "1");
         sendCustom("/ch/02/mix/fader", "0.0");
         resetChEq("02");
-        sendCustom("/outputs/main/01/src", "27"); // Send Ch 02 to OUT1
+        resetChEq("01");
+        sendCustom("/outputs/main/01/src", "26"); // Send Ch 01 to OUT1
         sendCustom("/config/routing/CARD/1-8", "20");
     }
 

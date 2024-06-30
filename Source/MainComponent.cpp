@@ -30,7 +30,7 @@ MainComponent::MainComponent()
 
     // Add buttons
     addAndMakeVisible(initButton);
-    initButton.setButtonText("Init");
+    initButton.setButtonText("X32 Initialization");
     initButton.addListener(this);
 
     //addAndMakeVisible(syncButton);
@@ -65,6 +65,18 @@ MainComponent::MainComponent()
     levelLabel.setText("Main LR Level", juce::dontSendNotification);
     levelLabel.setJustificationType(juce::Justification::centred);
     levelLabel.attachToComponent(&masterFaderSlider, false);
+
+    addAndMakeVisible(micSlider);
+    micSlider.setSliderStyle(juce::Slider::LinearVertical);
+    micSlider.setRange(0.0, 1.0);
+    micSlider.setTextValueSuffix("");
+    micSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
+    micSlider.addListener(this);
+
+    addAndMakeVisible(micLabel);
+    micLabel.setText("Mic Level", juce::dontSendNotification);
+    micLabel.setJustificationType(juce::Justification::centred);
+    micLabel.attachToComponent(&micSlider, false);
 
     //addAndMakeVisible(GEQSlider);
     GEQSlider.setSliderStyle(juce::Slider::LinearVertical);
@@ -184,7 +196,8 @@ void MainComponent::resized()
     auto topLeft = 50;
 
     // Add buttons
-    initButton.setBounds(topLeft, topLeft, getWidth() / 5, getHeight() / 25);
+    //initButton.setBounds(topLeft, topLeft, getWidth() / 5, getHeight() / 25);
+    initButton.setBounds(11 * getWidth() / 16 - getWidth() / 8, topLeft, getWidth() / 8, getHeight() / 25);
     syncButton.setBounds(topLeft, topLeft + getHeight() / 20, getWidth() / 5, getHeight() / 25);
     STModeButton.setBounds(12.1 * getWidth() / 16, 7 * getHeight() / 8, getWidth() / 12, getHeight() / 25);
     freezeButton.setBounds(11 * getWidth() / 16 - getWidth() / 12, 7 * getHeight() / 8 + 10, getWidth() / 12, getHeight() / 25);
@@ -194,6 +207,7 @@ void MainComponent::resized()
     // Add sliders
     auto sliderLeft = 120;
     masterFaderSlider.setBounds(12 * getWidth() / 16, 3 * getHeight() / 8, getWidth() / 15, getHeight() / 2.5);
+    micSlider.setBounds(13 * getWidth() / 16, 3 * getHeight() / 8, getWidth() / 15, getHeight() / 2.5);
     GEQSlider.setBounds(sliderLeft + getWidth() / 25, sliderLeft, getWidth() / 30, getHeight() / 2);
     delayMeasSlider.setBounds(9 * getWidth() / 16 - getWidth() / 8, 7.3 * getHeight() / 8 + 10, getWidth() / 8, getHeight() / 25);
     delayRefSlider.setBounds(9 * getWidth() / 16 - 2 * getWidth() / 8, 7.3 * getHeight() / 8 + 10, getWidth() / 8, getHeight() / 25);
@@ -209,7 +223,7 @@ void MainComponent::resized()
 void MainComponent::buttonClicked(juce::Button* button)
 {
     if (button == &initButton) {
-        DBG("Initializing...");
+        DBG("Initializing X32...");
         OSCEngine->OSCSender.initX32();
         //OSCEngine->OSCSender.fader("main", "st");
     }
@@ -224,10 +238,16 @@ void MainComponent::buttonClicked(juce::Button* button)
         if (STModeButton.getToggleState())
         {
             DBG("Self-test mode enabled!");
+            micSlider.setVisible(false);
+            micLabel.setVisible(false);
+            OSCEngine->OSCSender.sendCustom("/outputs/main/01/src", "27"); // OUT1 <- CH2
         }
         else
         {
             DBG("Self-test mode disabled!");
+            micSlider.setVisible(true);
+            micLabel.setVisible(true);
+            OSCEngine->OSCSender.sendCustom("/outputs/main/01/src", "26"); // OUT1 <- CH1
         }
     }
 
@@ -279,6 +299,11 @@ void MainComponent::sliderValueChanged (juce::Slider* slider)
         DBG("Slider value: " + juce::String(masterFaderSlider.getValue()));
         OSCEngine->OSCSender.fader("main", "st", (float)masterFaderSlider.getValue());
         //OSCEngine->OSCSender.fx(8, 15, (float)masterFaderSlider.getValue());
+    }
+
+    if (slider == &micSlider) {
+        DBG("Mic value: " + juce::String(micSlider.getValue()));
+        OSCEngine->OSCSender.fader("ch", "01", (float)micSlider.getValue());
     }
 
     if (slider == &GEQSlider) {

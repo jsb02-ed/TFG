@@ -63,6 +63,8 @@ private:
     juce::ToggleButton STModeButton;
     juce::Slider masterFaderSlider;
     juce::Label  levelLabel;
+    juce::Slider micSlider;
+    juce::Label micLabel;
     juce::Slider GEQSlider;
     juce::Label GEQLabel;
     juce::Label IPAddressLabel;
