@@ -402,6 +402,19 @@ public:
                 g.drawLine(x1, y1, x2, y2, 3);
 
                 // Draw freezed magnitude
+                if (freezed) {
+                    if (newFreezedMagnitude) {
+                        freezedMagnitude[i-1] = averageMagnitudeOut[i-1];
+                        freezedMagnitude[i] = averageMagnitudeOut[i];
+                        if (i == scopeSize  - 1) newFreezedMagnitude = false;
+                    }
+                    g.setColour(juce::Colours::aqua);
+                    float x1 = juce::jmap((float)(i - 1), 0.0f, (float)(scopeSize - 1), 0.0f, (float)width);
+                    float y1 = juce::jmap(freezedMagnitude[i - 1], 0.0f, 1.0f, (float)height, 0.0f);
+                    float x2 = juce::jmap((float)i, 0.0f, (float)(scopeSize - 1), 0.0f, (float)width);
+                    float y2 = juce::jmap(freezedMagnitude[i], 0.0f, 1.0f, (float)height, 0.0f);
+                    g.drawLine(x1, y1, x2, y2, 1);
+                }
 
                 // Draw the threshold line
                 if (showThreshold)
@@ -416,9 +429,9 @@ public:
             }
             // Draw phase -------------------------!!!!
             float v_offset = getHeight() / 2;
-            g.setColour(juce::Colours::red);
             for (int i = 1; i < scopeSize; ++i)
             {
+                g.setColour(juce::Colours::red);
                 float x1 = juce::jmap((float)(i - 1), 0.0f, (float)(scopeSize - 1), 0.0f, (float)width);
                 float y1 = juce::jmap(averagePhaseOut[i - 1], -juce::MathConstants<float>::pi, juce::MathConstants<float>::pi, (float)height, 0.0f) + v_offset;
                 float x2 = juce::jmap((float)i, 0.0f, (float)(scopeSize - 1), 0.0f, (float)width);
@@ -429,6 +442,26 @@ public:
                 if (std::abs(averagePhaseOut[i] - averagePhaseOut[i - 1]) < phaseWrapThreshold)
                 {
                     g.drawLine(x1, y1, x2, y2, 2);
+                }
+
+                // Draw freezed magnitude
+                if (freezed) {
+                    if (newFreezedPhase) {
+                        freezedPhase[i - 1] = averagePhaseOut[i - 1];
+                        freezedPhase[i] = averagePhaseOut[i];
+                        if (i == scopeSize - 1) newFreezedPhase = false;
+                    }
+                    g.setColour(juce::Colours::indianred);
+                    float x1 = juce::jmap((float)(i - 1), 0.0f, (float)(scopeSize - 1), 0.0f, (float)width);
+                    float y1 = juce::jmap(freezedPhase[i - 1], -juce::MathConstants<float>::pi, juce::MathConstants<float>::pi, (float)height, 0.0f) + v_offset;
+                    float x2 = juce::jmap((float)i, 0.0f, (float)(scopeSize - 1), 0.0f, (float)width);
+                    float y2 = juce::jmap(freezedPhase[i], -juce::MathConstants<float>::pi, juce::MathConstants<float>::pi, (float)height, 0.0f) + v_offset;
+
+                    const float phaseWrapThreshold = juce::MathConstants<float>::pi * 0.7f; // Add some tolerance
+                    if (std::abs(freezedPhase[i] - freezedPhase[i - 1]) < phaseWrapThreshold)
+                    {
+                        g.drawLine(x1, y1, x2, y2, 1);
+                    }
                 }
             }
         }
@@ -760,6 +793,8 @@ public:
     };
 
     bool freezed = false;
+    bool newFreezedMagnitude = false;
+    bool newFreezedPhase = false;
 
 private:
     juce::dsp::FFT forwardFFT;
@@ -788,6 +823,8 @@ private:
     juce::Array<float> averagePhaseFifo;
     float averageMagnitudeOut[scopeSize];
     float averagePhaseOut[scopeSize];
+    float freezedMagnitude[scopeSize];
+    float freezedPhase[scopeSize];
     juce::Array<float> avgMagnitude;
     juce::Array<float> avgMagnitudeSorted;
     int maxIdx = -1;

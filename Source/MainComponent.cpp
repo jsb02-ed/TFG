@@ -247,9 +247,18 @@ void MainComponent::buttonClicked(juce::Button* button)
     }
 
     if (button == &freezeButton) {
-        if (audioSetup.analyser.freezed) audioSetup.analyser.freezed = false;
-        else audioSetup.analyser.freezed = true;
-        DBG("Freeze state changed");
+        if (audioSetup.analyser.freezed) {
+            audioSetup.analyser.freezed = false;
+            freezeButton.setButtonText("Freeze");
+            DBG("Unfreezed data");
+        }
+        else { 
+            audioSetup.analyser.freezed = true;
+            freezeButton.setButtonText("Unfreeze");
+            audioSetup.analyser.newFreezedMagnitude = true;
+            audioSetup.analyser.newFreezedPhase = true;
+            DBG("Freezed data");
+        }
     }
 }
 
